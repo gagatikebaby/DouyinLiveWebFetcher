@@ -12,6 +12,9 @@ import string
 
 import requests
 import websocket
+
+import asyncio
+import websockets
 from protobuf.douyin import *
 
 
@@ -50,6 +53,7 @@ def generateTtwid():
 
 class DouyinLiveWebFetcher:
     
+    g_chatmessage = None
     def __init__(self, live_id):
         """
         直播间弹幕抓取对象
@@ -62,7 +66,7 @@ class DouyinLiveWebFetcher:
         self.live_url = "https://live.douyin.com/"
         self.user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) " \
                           "Chrome/120.0.0.0 Safari/537.36"
-    
+
     def start(self):
         self._connectWebSocket()
     
@@ -205,13 +209,15 @@ class DouyinLiveWebFetcher:
     def _wsOnClose(self, ws):
         print("WebSocket connection closed.")
     
-    def _parseChatMsg(self, payload):
+    async def _parseChatMsg(self, payload):
         '''聊天消息'''
         message = ChatMessage().parse(payload)
         user_name = message.user.nick_name
         user_id = message.user.id
         content = message.content
         print(f"【聊天msg】[{user_id}]{user_name}: {content}")
+        global g_chatmessage
+        g_chatmessage = f"【聊天msg】[{user_id}]{user_name}: {content}"
     
     def _parseGiftMsg(self, payload):
         '''礼物消息'''

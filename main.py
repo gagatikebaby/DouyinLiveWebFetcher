@@ -10,14 +10,18 @@ import asyncio
 import websockets
 from liveMan import DouyinLiveWebFetcher
 
-# async def echo(websocket, path):
-#     async for message in websocket:
-#         print(f"Received message: {message}")
-#         await websocket.send(f"Echo: {message}")
-# start_server = websockets.serve(echo, "localhost", 8765)
-# asyncio.get_event_loop().run_until_complete(start_server)
-# asyncio.get_event_loop().run_forever()
-
-if __name__ == '__main__':
-    live_id = '26012747113'
+async def main():
+    live_id = '519836445130'
     DouyinLiveWebFetcher(live_id).start()
+
+    async def echo(websocket, path):
+        async for message in websocket:
+            print(f"Received message: {message}")
+            await websocket.send(f"Echo: {message}")
+
+    start_server = websockets.serve(echo, "localhost", 8765)
+    await start_server
+
+asyncio.run(main())
+
+
